@@ -23,6 +23,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   Minimum0: 'The value cannot be negative.',
   Minimum1: 'The value must be at least 1.',
   Maximum100: 'The value cannot be more than 100.',
+  Maximum50: 'The value cannot be more than 50.',
   FutureDate: 'The date cannot be in the future.',
   NotFound: 'The requested record was not found.',
   FileTooLarge: 'The image must be 5 MB or smaller.',
