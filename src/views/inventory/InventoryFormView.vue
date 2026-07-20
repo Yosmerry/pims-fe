@@ -14,7 +14,11 @@ import { useRoute, useRouter } from 'vue-router'
 import { imageApi } from '@/api/image.api'
 import { inventoryApi } from '@/api/inventory.api'
 import { referenceApi } from '@/api/reference.api'
-import { MAX_IMAGES_PER_ITEM } from '@/constants/image'
+import {
+  MAX_IMAGES_PER_ITEM,
+  MAX_SOURCE_IMAGE_SIZE_BYTES,
+  MAX_WEBP_IMAGE_SIZE_BYTES,
+} from '@/constants/image'
 import {
   INVENTORY_CONDITIONS,
   INVENTORY_STATUSES,
@@ -26,6 +30,7 @@ import {
 import type { ReferenceItem } from '@/types/reference'
 import { getApiErrorMessage, getFieldErrors } from '@/utils/api-error'
 import { formatLabel } from '@/utils/format'
+import { compressImageToWebp } from '@/utils/image-compression'
 
 interface InventoryFormModel {
   categoryCode: string
@@ -48,13 +53,20 @@ const isSubmitting = ref(false)
 const categories = ref<ReferenceItem[]>([])
 const locations = ref<ReferenceItem[]>([])
 const imageFiles = ref<UploadUserFile[]>([])
-const selectedImage = ref<File | null>(null)
+const selectedImages = ref<File[]>([])
 const existingImageCount = ref(0)
 
 const isEdit = computed(() => route.name === 'inventory-edit')
 const itemCode = computed(() => (isEdit.value ? String(route.params.code) : null))
 const cancelPath = computed(() => (itemCode.value ? `/inventory/${itemCode.value}` : '/inventory'))
-const hasReachedImageLimit = computed(() => existingImageCount.value >= MAX_IMAGES_PER_ITEM)
+const imageSelectionLimit = computed(() =>
+  Math.max(0, MAX_IMAGES_PER_ITEM - existingImageCount.value),
+)
+const remainingImageSlots = computed(() =>
+  Math.max(0, imageSelectionLimit.value - selectedImages.value.length),
+)
+const totalImageCount = computed(() => existingImageCount.value + selectedImages.value.length)
+const hasReachedImageLimit = computed(() => totalImageCount.value >= MAX_IMAGES_PER_ITEM)
 
 const form = reactive<InventoryFormModel>({
   categoryCode: '',
@@ -145,40 +157,46 @@ const loadPage = async (): Promise<void> => {
 
 const disabledFutureDate = (date: Date): boolean => date.getTime() > Date.now()
 
+const syncSelectedImages = (uploadFiles: UploadFiles): void => {
+  imageFiles.value = uploadFiles.slice(0, imageSelectionLimit.value)
+  selectedImages.value = imageFiles.value.flatMap((file) => (file.raw ? [file.raw] : []))
+}
+
 const handleImageChange = (uploadFile: UploadFile, uploadFiles: UploadFiles): void => {
   const file = uploadFile.raw
   if (!file) return
 
-  if (hasReachedImageLimit.value) {
-    selectedImage.value = null
-    imageFiles.value = []
+  if (uploadFiles.length > imageSelectionLimit.value) {
+    syncSelectedImages(uploadFiles.filter((candidate) => candidate.uid !== uploadFile.uid))
     serverErrors.file = `Maximum of ${MAX_IMAGES_PER_ITEM} images per inventory item.`
     return
   }
 
   if (!['image/jpeg', 'image/png'].includes(file.type)) {
-    selectedImage.value = null
-    imageFiles.value = []
+    syncSelectedImages(uploadFiles.filter((candidate) => candidate.uid !== uploadFile.uid))
     serverErrors.file = 'Only JPEG and PNG images are supported.'
     return
   }
 
-  if (file.size > 5 * 1024 * 1024) {
-    selectedImage.value = null
-    imageFiles.value = []
+  if (file.size > MAX_SOURCE_IMAGE_SIZE_BYTES) {
+    syncSelectedImages(uploadFiles.filter((candidate) => candidate.uid !== uploadFile.uid))
     serverErrors.file = 'The image must be 5 MB or smaller.'
     return
   }
 
-  selectedImage.value = file
-  imageFiles.value = uploadFiles.slice(-1)
+  syncSelectedImages(uploadFiles)
   serverErrors.file = ''
 }
 
-const handleImageRemove = (): void => {
-  selectedImage.value = null
-  imageFiles.value = []
+const handleImageRemove = (_uploadFile: UploadFile, uploadFiles: UploadFiles): void => {
+  syncSelectedImages(uploadFiles)
   serverErrors.file = ''
+}
+
+const handleImageExceed = (): void => {
+  ElMessage.warning(
+    `You can add ${imageSelectionLimit.value} image${imageSelectionLimit.value === 1 ? '' : 's'} to this item.`,
+  )
 }
 
 const nullableText = (value: string): string | null => value.trim() || null
@@ -209,7 +227,7 @@ const submit = async (): Promise<void> => {
   const isValid = await formRef.value.validate().catch(() => false)
   if (!isValid) return
 
-  if (selectedImage.value && hasReachedImageLimit.value) {
+  if (selectedImages.value.length > imageSelectionLimit.value) {
     serverErrors.file = `Maximum of ${MAX_IMAGES_PER_ITEM} images per inventory item.`
     return
   }
@@ -217,6 +235,11 @@ const submit = async (): Promise<void> => {
   isSubmitting.value = true
 
   try {
+    const compressedImages: File[] = []
+    for (const image of selectedImages.value) {
+      compressedImages.push(await compressImageToWebp(image))
+    }
+
     const savedItem = isEdit.value
       ? await inventoryApi.update(itemCode.value as string, {
           ...createRequest(),
@@ -224,11 +247,15 @@ const submit = async (): Promise<void> => {
         } satisfies UpdateInventoryItemRequest)
       : await inventoryApi.create(createRequest())
 
-    if (selectedImage.value) {
+    let uploadedImageCount = 0
+    for (const image of compressedImages) {
       try {
-        await imageApi.upload(savedItem.code, selectedImage.value)
+        await imageApi.upload(savedItem.code, image)
+        uploadedImageCount += 1
       } catch (imageError) {
-        ElMessage.warning(`Item saved, but ${getApiErrorMessage(imageError).toLowerCase()}`)
+        ElMessage.warning(
+          `Item saved and ${uploadedImageCount} of ${compressedImages.length} images uploaded, but ${getApiErrorMessage(imageError).toLowerCase()}`,
+        )
         await router.replace(`/inventory/${savedItem.code}`)
         return
       }
@@ -237,6 +264,11 @@ const submit = async (): Promise<void> => {
     ElMessage.success(isEdit.value ? 'Inventory item updated.' : 'Inventory item created.')
     await router.replace(`/inventory/${savedItem.code}`)
   } catch (error) {
+    if (error instanceof Error && !('response' in error)) {
+      serverErrors.file = error.message
+      ElMessage.error(error.message)
+      return
+    }
     applyServerErrors(error)
     ElMessage.error(getApiErrorMessage(error))
   } finally {
@@ -449,14 +481,15 @@ onMounted(loadPage)
             <div>
               <h2>Image</h2>
               <p>
-                Add one optional JPEG or PNG image, up to 5 MB. Maximum
+                Add JPEG or PNG images, up to 5 MB each. They will be converted to WebP and
+                compressed to {{ MAX_WEBP_IMAGE_SIZE_BYTES / 1000 }} KB or smaller. Maximum
                 {{ MAX_IMAGES_PER_ITEM }} images per item.
               </p>
             </div>
           </div>
 
           <el-alert
-            v-if="hasReachedImageLimit"
+            v-if="hasReachedImageLimit && selectedImages.length === 0"
             :title="`Maximum of ${MAX_IMAGES_PER_ITEM} images reached`"
             description="Delete an existing image from the inventory detail page before uploading another."
             type="warning"
@@ -467,22 +500,32 @@ onMounted(loadPage)
           <el-form-item v-else :error="serverErrors.file" class="image-upload-item">
             <el-upload
               v-model:file-list="imageFiles"
+              :class="{ 'image-upload--full': remainingImageSlots === 0 }"
               drag
+              multiple
               action="#"
               accept="image/jpeg,image/png"
               :auto-upload="false"
-              :limit="1"
+              :limit="imageSelectionLimit"
               :on-change="handleImageChange"
               :on-remove="handleImageRemove"
-              :on-exceed="() => ElMessage.warning('Only one image can be uploaded at a time.')"
+              :on-exceed="handleImageExceed"
             >
-              <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
-              <div class="el-upload__text">Drop an image here or <em>browse</em></div>
+              <template v-if="remainingImageSlots > 0">
+                <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
+                <div class="el-upload__text">
+                  Drop images here or <em>browse</em>
+                  <small>
+                    {{ remainingImageSlots }} slot{{ remainingImageSlots === 1 ? '' : 's' }}
+                    remaining
+                  </small>
+                </div>
+              </template>
               <template #tip>
                 <div class="el-upload__tip">
                   <el-icon><Picture /></el-icon>
-                  {{ existingImageCount }} / {{ MAX_IMAGES_PER_ITEM }} images currently uploaded.
-                  The first uploaded image becomes primary.
+                  {{ totalImageCount }} / {{ MAX_IMAGES_PER_ITEM }} images after saving. The first
+                  uploaded image becomes primary.
                 </div>
               </template>
             </el-upload>
