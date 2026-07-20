@@ -34,6 +34,11 @@ const router = createRouter({
           name: 'inventory-edit',
           component: () => import('@/views/inventory/InventoryFormView.vue'),
         },
+        {
+          path: 'categories',
+          name: 'category-list',
+          component: () => import('@/views/category/CategoryListView.vue'),
+        },
       ],
     },
     {

@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { ArrowDown, Box, Expand, Fold, Goods, SwitchButton } from '@element-plus/icons-vue'
+import {
+  ArrowDown,
+  Box,
+  CollectionTag,
+  Expand,
+  Fold,
+  Goods,
+  SwitchButton,
+} from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -90,6 +98,10 @@ const logout = async (): Promise<void> => {
             <el-icon><Goods /></el-icon>
             <template #title>Inventory</template>
           </el-menu-item>
+          <el-menu-item index="/categories">
+            <el-icon><CollectionTag /></el-icon>
+            <template #title>Categories</template>
+          </el-menu-item>
         </el-menu>
       </el-aside>
 
@@ -110,6 +122,10 @@ const logout = async (): Promise<void> => {
         <el-menu-item index="/inventory" @click="navigateFromDrawer('/inventory')">
           <el-icon><Goods /></el-icon>
           <template #title>Inventory</template>
+        </el-menu-item>
+        <el-menu-item index="/categories" @click="navigateFromDrawer('/categories')">
+          <el-icon><CollectionTag /></el-icon>
+          <template #title>Categories</template>
         </el-menu-item>
       </el-menu>
     </el-drawer>
