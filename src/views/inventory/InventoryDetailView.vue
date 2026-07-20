@@ -18,6 +18,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { imageApi } from '@/api/image.api'
 import { inventoryApi } from '@/api/inventory.api'
 import { referenceApi } from '@/api/reference.api'
+import { MAX_IMAGES_PER_ITEM } from '@/constants/image'
 import type { InventoryImage } from '@/types/image'
 import type { InventoryItem, InventoryStatus } from '@/types/inventory'
 import { getApiErrorMessage } from '@/utils/api-error'
@@ -47,6 +48,7 @@ const statusTagTypes: Record<InventoryStatus, 'success' | 'warning' | 'info' | '
   DISPOSED: 'info',
 }
 const previewUrls = computed(() => galleryImages.value.map((image) => image.objectUrl))
+const canAddImage = computed(() => galleryImages.value.length < MAX_IMAGES_PER_ITEM)
 
 const clearGalleryImages = (): void => {
   galleryImages.value.forEach((image) => URL.revokeObjectURL(image.objectUrl))
@@ -205,11 +207,18 @@ onBeforeUnmount(clearGalleryImages)
                 <span>
                   <el-icon><Picture /></el-icon>
                   Images
-                  <el-tag effect="plain" round>{{ galleryImages.length }}</el-tag>
+                  <el-tag effect="plain" round>
+                    {{ galleryImages.length }} / {{ MAX_IMAGES_PER_ITEM }}
+                  </el-tag>
                 </span>
-                <el-button :icon="Upload" @click="router.push(`/inventory/${item.code}/edit`)">
+                <el-button
+                  v-if="canAddImage"
+                  :icon="Upload"
+                  @click="router.push(`/inventory/${item.code}/edit`)"
+                >
                   Add image
                 </el-button>
+                <el-tag v-else type="warning" effect="light" round>Limit reached</el-tag>
               </div>
             </template>
 

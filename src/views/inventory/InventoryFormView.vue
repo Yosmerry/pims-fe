@@ -14,6 +14,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { imageApi } from '@/api/image.api'
 import { inventoryApi } from '@/api/inventory.api'
 import { referenceApi } from '@/api/reference.api'
+import { MAX_IMAGES_PER_ITEM } from '@/constants/image'
 import {
   INVENTORY_CONDITIONS,
   INVENTORY_STATUSES,
@@ -48,10 +49,12 @@ const categories = ref<ReferenceItem[]>([])
 const locations = ref<ReferenceItem[]>([])
 const imageFiles = ref<UploadUserFile[]>([])
 const selectedImage = ref<File | null>(null)
+const existingImageCount = ref(0)
 
 const isEdit = computed(() => route.name === 'inventory-edit')
 const itemCode = computed(() => (isEdit.value ? String(route.params.code) : null))
 const cancelPath = computed(() => (itemCode.value ? `/inventory/${itemCode.value}` : '/inventory'))
+const hasReachedImageLimit = computed(() => existingImageCount.value >= MAX_IMAGES_PER_ITEM)
 
 const form = reactive<InventoryFormModel>({
   categoryCode: '',
@@ -117,7 +120,11 @@ const loadPage = async (): Promise<void> => {
     locations.value = locationResult
 
     if (itemCode.value) {
-      const item = await inventoryApi.findByCode(itemCode.value)
+      const [item, images] = await Promise.all([
+        inventoryApi.findByCode(itemCode.value),
+        imageApi.findAll(itemCode.value),
+      ])
+      existingImageCount.value = images.length
       form.categoryCode = item.categoryCode
       form.locationCode = item.locationCode ?? ''
       form.name = item.name
@@ -141,6 +148,13 @@ const disabledFutureDate = (date: Date): boolean => date.getTime() > Date.now()
 const handleImageChange = (uploadFile: UploadFile, uploadFiles: UploadFiles): void => {
   const file = uploadFile.raw
   if (!file) return
+
+  if (hasReachedImageLimit.value) {
+    selectedImage.value = null
+    imageFiles.value = []
+    serverErrors.file = `Maximum of ${MAX_IMAGES_PER_ITEM} images per inventory item.`
+    return
+  }
 
   if (!['image/jpeg', 'image/png'].includes(file.type)) {
     selectedImage.value = null
@@ -194,6 +208,11 @@ const submit = async (): Promise<void> => {
   clearServerErrors()
   const isValid = await formRef.value.validate().catch(() => false)
   if (!isValid) return
+
+  if (selectedImage.value && hasReachedImageLimit.value) {
+    serverErrors.file = `Maximum of ${MAX_IMAGES_PER_ITEM} images per inventory item.`
+    return
+  }
 
   isSubmitting.value = true
 
@@ -429,11 +448,23 @@ onMounted(loadPage)
             <span>3</span>
             <div>
               <h2>Image</h2>
-              <p>Add an optional JPEG or PNG image, up to 5 MB.</p>
+              <p>
+                Add one optional JPEG or PNG image, up to 5 MB. Maximum
+                {{ MAX_IMAGES_PER_ITEM }} images per item.
+              </p>
             </div>
           </div>
 
-          <el-form-item :error="serverErrors.file" class="image-upload-item">
+          <el-alert
+            v-if="hasReachedImageLimit"
+            :title="`Maximum of ${MAX_IMAGES_PER_ITEM} images reached`"
+            description="Delete an existing image from the inventory detail page before uploading another."
+            type="warning"
+            show-icon
+            :closable="false"
+          />
+
+          <el-form-item v-else :error="serverErrors.file" class="image-upload-item">
             <el-upload
               v-model:file-list="imageFiles"
               drag
@@ -450,7 +481,8 @@ onMounted(loadPage)
               <template #tip>
                 <div class="el-upload__tip">
                   <el-icon><Picture /></el-icon>
-                  The first uploaded image becomes the primary image.
+                  {{ existingImageCount }} / {{ MAX_IMAGES_PER_ITEM }} images currently uploaded.
+                  The first uploaded image becomes primary.
                 </div>
               </template>
             </el-upload>
