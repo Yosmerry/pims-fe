@@ -7,6 +7,10 @@ const ERROR_MESSAGES: Record<string, string> = {
   InvalidFormat: 'Enter a valid value.',
   CharacterMoreThan150: 'Use no more than 150 characters.',
   CharacterMoreThan255: 'Use no more than 255 characters.',
+  CharacterMoreThan20: 'Use no more than 20 characters.',
+  CharacterMoreThan100: 'Use no more than 100 characters.',
+  CharacterMoreThan500: 'Use no more than 500 characters.',
+  CharacterMoreThan1000: 'Use no more than 1,000 characters.',
   CharacterLessThan8: 'Use at least 8 characters.',
   CharacterMoreThan72: 'Use no more than 72 characters.',
   WeakPassword: 'Use uppercase, lowercase, number, and special characters.',
@@ -15,12 +19,27 @@ const ERROR_MESSAGES: Record<string, string> = {
   InvalidCredentials: 'The email or password is incorrect.',
   UserInactive: 'Your account is inactive. Please contact support.',
   Missing: 'Your session is missing. Please sign in again.',
-  Invalid: 'Your session has expired. Please sign in again.',
+  Invalid: 'Enter a valid value.',
+  Minimum0: 'The value cannot be negative.',
+  Minimum1: 'The value must be at least 1.',
+  Maximum100: 'The value cannot be more than 100.',
+  Maximum50: 'The value cannot be more than 50.',
+  FutureDate: 'The date cannot be in the future.',
+  NotFound: 'The requested record was not found.',
+  FileTooLarge: 'The image must be 5 MB or smaller.',
+  UnsupportedFileType: 'Only JPEG and PNG images are supported.',
+  StorageFailed: 'The image could not be stored. Please try again.',
 }
 
 export type FieldErrors = Record<string, string>
 
-const translateError = (errorCode: string): string => ERROR_MESSAGES[errorCode] ?? errorCode
+const translateError = (field: string, errorCode: string): string => {
+  if (field === 'refreshToken' && errorCode === 'Invalid') {
+    return 'Your session has expired. Please sign in again.'
+  }
+
+  return ERROR_MESSAGES[errorCode] ?? errorCode
+}
 
 export function getFieldErrors(error: unknown): FieldErrors {
   if (!axios.isAxiosError<ApiErrorResponse>(error)) {
@@ -35,7 +54,7 @@ export function getFieldErrors(error: unknown): FieldErrors {
   return Object.fromEntries(
     Object.entries(errors).flatMap(([field, codes]) => {
       const firstCode = codes[0]
-      return firstCode ? [[field, translateError(firstCode)]] : []
+      return firstCode ? [[field, translateError(field, firstCode)]] : []
     }),
   )
 }

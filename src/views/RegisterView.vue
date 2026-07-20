@@ -114,8 +114,6 @@ const submit = async (): Promise<void> => {
           keepsakes.
         </p>
       </div>
-
-      <div class="brand-note">Simple · Organized · Personal</div>
     </section>
 
     <section class="auth-content auth-content--register">

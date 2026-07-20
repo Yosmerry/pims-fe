@@ -7,9 +7,34 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: () => import('@/views/HomeView.vue'),
+      component: () => import('@/layouts/AppLayout.vue'),
       meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          redirect: '/inventory',
+        },
+        {
+          path: 'inventory',
+          name: 'inventory-list',
+          component: () => import('@/views/inventory/InventoryListView.vue'),
+        },
+        {
+          path: 'inventory/new',
+          name: 'inventory-create',
+          component: () => import('@/views/inventory/InventoryFormView.vue'),
+        },
+        {
+          path: 'inventory/:code',
+          name: 'inventory-detail',
+          component: () => import('@/views/inventory/InventoryDetailView.vue'),
+        },
+        {
+          path: 'inventory/:code/edit',
+          name: 'inventory-edit',
+          component: () => import('@/views/inventory/InventoryFormView.vue'),
+        },
+      ],
     },
     {
       path: '/login',
@@ -38,7 +63,7 @@ router.beforeEach((to) => {
   }
 
   if (to.meta.guestOnly && isAuthenticated) {
-    return { name: 'home' }
+    return { name: 'inventory-list' }
   }
 
   return true
