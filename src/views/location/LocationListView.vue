@@ -3,30 +3,30 @@ import { nextTick, onMounted, reactive, ref } from 'vue'
 import { Delete, Edit, Plus, Refresh } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 
-import { categoryApi } from '@/api/category.api'
+import { locationApi } from '@/api/location.api'
 import type {
-  Category,
-  CategoryStatus,
-  CreateCategoryRequest,
-  UpdateCategoryRequest,
-} from '@/types/category'
+  CreateLocationRequest,
+  Location,
+  LocationStatus,
+  UpdateLocationRequest,
+} from '@/types/location'
 import type { PageResponse } from '@/types/pagination'
 import { getApiErrorMessage, getFieldErrors } from '@/utils/api-error'
 import { formatDateTime, formatLabel } from '@/utils/format'
 
-interface CategoryFormModel {
+interface LocationFormModel {
   name: string
   description: string
-  status: CategoryStatus
+  status: LocationStatus
 }
 
 const isLoading = ref(false)
 const isSubmitting = ref(false)
 const dialogVisible = ref(false)
-const editingCategory = ref<Category | null>(null)
+const editingLocation = ref<Location | null>(null)
 const formRef = ref<FormInstance>()
 
-const result = reactive<PageResponse<Category>>({
+const result = reactive<PageResponse<Location>>({
   content: [],
   page: 0,
   size: 20,
@@ -36,7 +36,7 @@ const result = reactive<PageResponse<Category>>({
   last: true,
 })
 
-const form = reactive<CategoryFormModel>({
+const form = reactive<LocationFormModel>({
   name: '',
   description: '',
   status: 'ACTIVE',
@@ -48,9 +48,9 @@ const serverErrors = reactive({
   status: '',
 })
 
-const rules: FormRules<CategoryFormModel> = {
+const rules: FormRules<LocationFormModel> = {
   name: [
-    { required: true, message: 'Category name is required.', trigger: 'blur' },
+    { required: true, message: 'Location name is required.', trigger: 'blur' },
     { max: 100, message: 'Use no more than 100 characters.', trigger: 'blur' },
   ],
   description: [{ max: 500, message: 'Use no more than 500 characters.', trigger: 'blur' }],
@@ -63,11 +63,11 @@ const clearServerErrors = (): void => {
   serverErrors.status = ''
 }
 
-const loadCategories = async (): Promise<void> => {
+const loadLocations = async (): Promise<void> => {
   isLoading.value = true
 
   try {
-    const response = await categoryApi.findAll(result.page, result.size)
+    const response = await locationApi.findAll(result.page, result.size)
     Object.assign(result, response)
   } catch (error) {
     ElMessage.error(getApiErrorMessage(error))
@@ -82,7 +82,7 @@ const resetFormValidation = (): void => {
 }
 
 const openCreateDialog = (): void => {
-  editingCategory.value = null
+  editingLocation.value = null
   form.name = ''
   form.description = ''
   form.status = 'ACTIVE'
@@ -90,11 +90,11 @@ const openCreateDialog = (): void => {
   resetFormValidation()
 }
 
-const openEditDialog = (category: Category): void => {
-  editingCategory.value = category
-  form.name = category.name
-  form.description = category.description ?? ''
-  form.status = category.status
+const openEditDialog = (location: Location): void => {
+  editingLocation.value = location
+  form.name = location.name
+  form.description = location.description ?? ''
+  form.status = location.status
   dialogVisible.value = true
   resetFormValidation()
 }
@@ -111,26 +111,26 @@ const submit = async (): Promise<void> => {
   isSubmitting.value = true
 
   try {
-    if (editingCategory.value) {
-      const request: UpdateCategoryRequest = {
+    if (editingLocation.value) {
+      const request: UpdateLocationRequest = {
         name: form.name.trim(),
         description: nullableDescription(),
         status: form.status,
       }
-      await categoryApi.update(editingCategory.value.code, request)
-      ElMessage.success('Category updated.')
+      await locationApi.update(editingLocation.value.code, request)
+      ElMessage.success('Location updated.')
     } else {
-      const request: CreateCategoryRequest = {
+      const request: CreateLocationRequest = {
         name: form.name.trim(),
         description: nullableDescription(),
       }
-      await categoryApi.create(request)
+      await locationApi.create(request)
       result.page = 0
-      ElMessage.success('Category created.')
+      ElMessage.success('Location created.')
     }
 
     dialogVisible.value = false
-    await loadCategories()
+    await loadLocations()
   } catch (error) {
     const fieldErrors = getFieldErrors(error)
     serverErrors.name = fieldErrors.name ?? ''
@@ -142,11 +142,11 @@ const submit = async (): Promise<void> => {
   }
 }
 
-const deleteCategory = async (category: Category): Promise<void> => {
+const deleteLocation = async (location: Location): Promise<void> => {
   try {
     await ElMessageBox.confirm(
-      `Delete “${category.name}”? This category will no longer be available for new inventory items.`,
-      'Delete category',
+      `Delete “${location.name}”? This location will no longer be available for new inventory items.`,
+      'Delete location',
       {
         type: 'warning',
         confirmButtonText: 'Delete',
@@ -154,13 +154,13 @@ const deleteCategory = async (category: Category): Promise<void> => {
         confirmButtonClass: 'el-button--danger',
       },
     )
-    await categoryApi.delete(category.code)
-    ElMessage.success('Category deleted.')
+    await locationApi.delete(location.code)
+    ElMessage.success('Location deleted.')
 
     if (result.content.length === 1 && result.page > 0) {
       result.page -= 1
     }
-    await loadCategories()
+    await loadLocations()
   } catch (error) {
     if (error !== 'cancel' && error !== 'close') {
       ElMessage.error(getApiErrorMessage(error))
@@ -170,56 +170,51 @@ const deleteCategory = async (category: Category): Promise<void> => {
 
 const changePage = (page: number): void => {
   result.page = page - 1
-  void loadCategories()
+  void loadLocations()
 }
 
 const changePageSize = (size: number): void => {
   result.size = size
   result.page = 0
-  void loadCategories()
+  void loadLocations()
 }
 
-onMounted(loadCategories)
+onMounted(loadLocations)
 </script>
 
 <template>
-  <section class="app-page category-page">
+  <section class="app-page location-page">
     <el-breadcrumb separator="/" class="page-breadcrumb">
       <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
-      <el-breadcrumb-item>Categories</el-breadcrumb-item>
+      <el-breadcrumb-item>Locations</el-breadcrumb-item>
     </el-breadcrumb>
 
     <header class="page-heading">
-      <p class="eyebrow">Inventory organization</p>
+      <p class="eyebrow">Inventory locations</p>
 
       <el-button type="primary" :icon="Plus" size="large" @click="openCreateDialog">
-        Add category
+        Add location
       </el-button>
     </header>
 
-    <el-card class="app-card data-table-card category-table-card" shadow="never">
+    <el-card class="app-card data-table-card location-table-card" shadow="never">
       <template #header>
         <div class="table-card-heading">
           <div>
-            <h2>Category list</h2>
+            <h2>Location list</h2>
             <p>
               {{ result.totalElements }}
-              {{ result.totalElements === 1 ? 'category' : 'categories' }}
+              {{ result.totalElements === 1 ? 'location' : 'locations' }}
             </p>
           </div>
-          <el-button
-            :icon="Refresh"
-            circle
-            aria-label="Refresh categories"
-            @click="loadCategories"
-          />
+          <el-button :icon="Refresh" circle aria-label="Refresh locations" @click="loadLocations" />
         </div>
       </template>
 
       <div class="data-table-wrap">
-        <el-table v-loading="isLoading" :data="result.content" empty-text="No categories found">
-          <el-table-column label="Category" min-width="220">
-            <template #default="{ row }: { row: Category }">
+        <el-table v-loading="isLoading" :data="result.content" empty-text="No locations found">
+          <el-table-column label="Location" min-width="220">
+            <template #default="{ row }: { row: Location }">
               <div class="reference-name-cell">
                 <span>{{ row.name }}</span>
                 <small>{{ row.code }}</small>
@@ -228,13 +223,13 @@ onMounted(loadCategories)
           </el-table-column>
 
           <el-table-column prop="description" label="Description" min-width="320">
-            <template #default="{ row }: { row: Category }">
+            <template #default="{ row }: { row: Location }">
               <span class="reference-description">{{ row.description || '—' }}</span>
             </template>
           </el-table-column>
 
           <el-table-column label="Status" width="120">
-            <template #default="{ row }: { row: Category }">
+            <template #default="{ row }: { row: Location }">
               <el-tag :type="row.status === 'ACTIVE' ? 'success' : 'info'" effect="light" round>
                 {{ formatLabel(row.status) }}
               </el-tag>
@@ -242,24 +237,24 @@ onMounted(loadCategories)
           </el-table-column>
 
           <el-table-column label="Updated" min-width="170">
-            <template #default="{ row }: { row: Category }">
+            <template #default="{ row }: { row: Location }">
               {{ formatDateTime(row.updatedDate) }}
             </template>
           </el-table-column>
 
           <el-table-column label="Actions" width="110" fixed="right">
-            <template #default="{ row }: { row: Category }">
+            <template #default="{ row }: { row: Location }">
               <div class="table-actions">
-                <el-tooltip content="Edit category">
+                <el-tooltip content="Edit location">
                   <el-button :icon="Edit" circle @click="openEditDialog(row)" />
                 </el-tooltip>
-                <el-tooltip content="Delete category">
+                <el-tooltip content="Delete location">
                   <el-button
                     :icon="Delete"
                     circle
                     type="danger"
                     plain
-                    @click="deleteCategory(row)"
+                    @click="deleteLocation(row)"
                   />
                 </el-tooltip>
               </div>
@@ -285,7 +280,7 @@ onMounted(loadCategories)
     <el-dialog
       v-model="dialogVisible"
       class="reference-dialog"
-      :title="editingCategory ? 'Edit category' : 'Add category'"
+      :title="editingLocation ? 'Edit location' : 'Add location'"
       width="min(92vw, 540px)"
       destroy-on-close
       align-center
@@ -303,7 +298,7 @@ onMounted(loadCategories)
             v-model.trim="form.name"
             maxlength="100"
             show-word-limit
-            placeholder="e.g. Electronics"
+            placeholder="e.g. Garage"
             @input="serverErrors.name = ''"
           />
         </el-form-item>
@@ -319,13 +314,13 @@ onMounted(loadCategories)
             :rows="4"
             maxlength="500"
             show-word-limit
-            placeholder="Describe the items that belong to this category"
+            placeholder="Describe where items are stored"
             @input="serverErrors.description = ''"
           />
         </el-form-item>
 
         <el-form-item
-          v-if="editingCategory"
+          v-if="editingLocation"
           label="Status"
           prop="status"
           :error="serverErrors.status"
@@ -342,7 +337,7 @@ onMounted(loadCategories)
       <template #footer>
         <el-button size="large" @click="dialogVisible = false">Cancel</el-button>
         <el-button type="primary" size="large" :loading="isSubmitting" @click="submit">
-          {{ editingCategory ? 'Save changes' : 'Create category' }}
+          {{ editingLocation ? 'Save changes' : 'Create location' }}
         </el-button>
       </template>
     </el-dialog>

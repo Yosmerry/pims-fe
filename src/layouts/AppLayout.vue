@@ -7,6 +7,7 @@ import {
   Expand,
   Fold,
   Goods,
+  Location,
   SwitchButton,
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -102,6 +103,10 @@ const logout = async (): Promise<void> => {
             <el-icon><CollectionTag /></el-icon>
             <template #title>Categories</template>
           </el-menu-item>
+          <el-menu-item index="/locations">
+            <el-icon><Location /></el-icon>
+            <template #title>Locations</template>
+          </el-menu-item>
         </el-menu>
       </el-aside>
 
@@ -126,6 +131,10 @@ const logout = async (): Promise<void> => {
         <el-menu-item index="/categories" @click="navigateFromDrawer('/categories')">
           <el-icon><CollectionTag /></el-icon>
           <template #title>Categories</template>
+        </el-menu-item>
+        <el-menu-item index="/locations" @click="navigateFromDrawer('/locations')">
+          <el-icon><Location /></el-icon>
+          <template #title>Locations</template>
         </el-menu-item>
       </el-menu>
     </el-drawer>

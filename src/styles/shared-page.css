@@ -124,6 +124,69 @@
   margin: 80px auto 0;
 }
 
+.reference-name-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: var(--pims-navy);
+}
+
+.reference-name-cell span {
+  font-weight: 700;
+}
+
+.reference-name-cell small {
+  margin-top: 3px;
+  color: var(--pims-gray);
+}
+
+.reference-description {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #596579;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.reference-dialog.el-dialog {
+  border-radius: 16px;
+}
+
+.reference-dialog .el-dialog__header {
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid rgb(30 45 76 / 8%);
+}
+
+.reference-dialog .el-dialog__title {
+  color: var(--pims-navy);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.reference-dialog .el-dialog__body {
+  padding: 24px;
+}
+
+.reference-dialog .el-dialog__footer {
+  padding: 18px 24px 22px;
+  border-top: 1px solid rgb(30 45 76 / 8%);
+}
+
+.reference-dialog .el-dialog__footer .el-button {
+  min-width: 116px;
+}
+
+.hidden-submit {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+}
+
 @media (max-width: 760px) {
   .page-breadcrumb {
     margin-bottom: 18px;
@@ -140,6 +203,21 @@
 
   .data-table-card .el-card__body {
     padding-inline: 12px;
+  }
+
+  .reference-dialog .el-dialog__body {
+    padding: 20px;
+  }
+
+  .reference-dialog .el-dialog__footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .reference-dialog .el-dialog__footer .el-button {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
   }
 }
 

@@ -8,6 +8,7 @@ import './styles/layout.css'
 import './styles/shared-page.css'
 import './styles/inventory.css'
 import './styles/categories.css'
+import './styles/locations.css'
 
 import App from './App.vue'
 import router from './router'
