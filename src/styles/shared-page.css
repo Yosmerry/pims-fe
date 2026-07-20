@@ -1,0 +1,150 @@
+.app-page {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.page-breadcrumb {
+  margin-bottom: 24px;
+}
+
+.page-heading {
+  display: flex;
+  margin-bottom: 24px;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.page-heading h1 {
+  margin: 7px 0 6px;
+  color: var(--pims-navy);
+  font-family: var(--pims-font-display);
+  font-size: clamp(28px, 3vw, 38px);
+  letter-spacing: -0.035em;
+}
+
+.page-heading > div > p:last-child {
+  margin: 0;
+  color: var(--pims-gray);
+}
+
+.app-card.el-card {
+  border: 1px solid rgb(30 45 76 / 8%);
+  border-radius: 16px;
+  background: rgb(255 255 255 / 96%);
+  box-shadow: 0 12px 36px rgb(30 45 76 / 7%);
+}
+
+.app-card .el-card__header {
+  padding: 18px 20px;
+  border-bottom-color: rgb(30 45 76 / 8%);
+}
+
+.card-heading,
+.card-heading > span,
+.table-card-heading {
+  display: flex;
+  align-items: center;
+}
+
+.card-heading {
+  justify-content: space-between;
+  color: var(--pims-navy);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.card-heading > span {
+  gap: 8px;
+}
+
+.data-table-card {
+  min-width: 0;
+}
+
+.data-table-card .el-card__body {
+  padding: 0 20px 20px;
+}
+
+.table-card-heading {
+  justify-content: space-between;
+}
+
+.table-card-heading h2 {
+  margin: 0 0 3px;
+  color: var(--pims-navy);
+  font-size: 19px;
+}
+
+.table-card-heading p {
+  margin: 0;
+  color: var(--pims-gray);
+  font-size: 13px;
+}
+
+.data-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.data-table-card .el-table {
+  --el-table-header-bg-color: #f7f9fa;
+  --el-table-header-text-color: #35425a;
+  --el-table-row-hover-bg-color: rgb(172 189 170 / 12%);
+}
+
+.data-table-card .el-table th.el-table__cell {
+  height: 48px;
+  font-weight: 700;
+}
+
+.data-table-card .el-table td.el-table__cell {
+  padding: 11px 0;
+}
+
+.table-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.table-actions .el-button {
+  margin: 0;
+}
+
+.pagination-row {
+  display: flex;
+  padding-top: 22px;
+  justify-content: flex-end;
+  overflow-x: auto;
+}
+
+.not-found-card {
+  max-width: 680px;
+  margin: 80px auto 0;
+}
+
+@media (max-width: 760px) {
+  .page-breadcrumb {
+    margin-bottom: 18px;
+  }
+
+  .page-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .page-heading > .el-button {
+    width: 100%;
+  }
+
+  .data-table-card .el-card__body {
+    padding-inline: 12px;
+  }
+}
+
+@media (max-width: 440px) {
+  .pagination-row {
+    justify-content: flex-start;
+  }
+}

@@ -4,7 +4,10 @@ import { createPinia } from 'pinia'
 
 import 'element-plus/dist/index.css'
 import './styles/main.css'
+import './styles/layout.css'
+import './styles/shared-page.css'
 import './styles/inventory.css'
+import './styles/categories.css'
 
 import App from './App.vue'
 import router from './router'
