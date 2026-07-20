@@ -14,11 +14,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { imageApi } from '@/api/image.api'
 import { inventoryApi } from '@/api/inventory.api'
 import { referenceApi } from '@/api/reference.api'
-import {
-  MAX_IMAGES_PER_ITEM,
-  MAX_SOURCE_IMAGE_SIZE_BYTES,
-  MAX_WEBP_IMAGE_SIZE_BYTES,
-} from '@/constants/image'
+import { MAX_IMAGES_PER_ITEM, MAX_SOURCE_IMAGE_SIZE_BYTES } from '@/constants/image'
 import {
   INVENTORY_CONDITIONS,
   INVENTORY_STATUSES,
@@ -481,8 +477,7 @@ onMounted(loadPage)
             <div>
               <h2>Image</h2>
               <p>
-                Add JPEG or PNG images, up to 5 MB each. They will be converted to WebP and
-                compressed to {{ MAX_WEBP_IMAGE_SIZE_BYTES / 1000 }} KB or smaller. Maximum
+                Add JPEG or PNG images, up to 5 MB each. Maximum
                 {{ MAX_IMAGES_PER_ITEM }} images per item.
               </p>
             </div>

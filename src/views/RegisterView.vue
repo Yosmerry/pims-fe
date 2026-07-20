@@ -119,9 +119,7 @@ const submit = async (): Promise<void> => {
     <section class="auth-content auth-content--register">
       <el-card class="auth-card" shadow="never">
         <header class="auth-card__header">
-          <p class="eyebrow">Get started</p>
           <h2>Create your account</h2>
-          <p>Your first inventory is only a few details away.</p>
         </header>
 
         <el-form
