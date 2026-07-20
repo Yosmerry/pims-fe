@@ -190,11 +190,7 @@ onMounted(loadCategories)
     </el-breadcrumb>
 
     <header class="page-heading">
-      <div>
-        <p class="eyebrow">Inventory organization</p>
-        <h1>Categories</h1>
-        <p>Group similar belongings so they are easier to find.</p>
-      </div>
+      <p class="eyebrow">Inventory organization</p>
 
       <el-button type="primary" :icon="Plus" size="large" @click="openCreateDialog">
         Add category
