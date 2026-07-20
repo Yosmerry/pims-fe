@@ -50,7 +50,6 @@ const selectedImage = ref<File | null>(null)
 
 const isEdit = computed(() => route.name === 'inventory-edit')
 const itemCode = computed(() => (isEdit.value ? String(route.params.code) : null))
-const pageTitle = computed(() => (isEdit.value ? 'Edit inventory item' : 'Add inventory item'))
 const cancelPath = computed(() => (itemCode.value ? `/inventory/${itemCode.value}` : '/inventory'))
 
 const form = reactive<InventoryFormModel>({
@@ -238,13 +237,6 @@ onMounted(loadPage)
 
     <div class="form-page__heading">
       <el-button :icon="ArrowLeft" text @click="router.push(cancelPath)">Back</el-button>
-      <div>
-        <p class="eyebrow">{{ isEdit ? itemCode : 'New record' }}</p>
-        <h1>{{ pageTitle }}</h1>
-        <p>
-          {{ isEdit ? 'Update the details below.' : 'Add the item details to your inventory.' }}
-        </p>
-      </div>
     </div>
 
     <el-card class="inventory-form-card" shadow="never">

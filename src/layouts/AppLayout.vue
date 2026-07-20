@@ -9,7 +9,7 @@ import { useAuthStore } from '@/stores/auth'
 const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
-const isCollapsed = ref(false)
+const isCollapsed = ref(true)
 const drawerOpen = ref(false)
 
 const initials = computed(() => {
@@ -67,8 +67,6 @@ const logout = async (): Promise<void> => {
       </div>
 
       <div class="app-header__right">
-        <span class="online-status"><i /> Online</span>
-
         <el-dropdown trigger="click" @command="logout">
           <button class="profile-menu" type="button">
             <el-avatar :size="36">{{ initials }}</el-avatar>
@@ -86,7 +84,7 @@ const logout = async (): Promise<void> => {
     </el-header>
 
     <el-container class="app-body">
-      <el-aside :width="isCollapsed ? '76px' : '232px'" class="app-sidebar">
+      <el-aside width="232px" class="app-sidebar" :class="{ 'app-sidebar--hidden': isCollapsed }">
         <el-menu :default-active="route.path" :collapse="isCollapsed" router>
           <el-menu-item index="/inventory">
             <el-icon><Goods /></el-icon>
@@ -108,7 +106,7 @@ const logout = async (): Promise<void> => {
         </div>
       </div>
 
-      <el-menu :default-active="route.path">
+      <el-menu :default-active="route.path" router>
         <el-menu-item index="/inventory" @click="navigateFromDrawer('/inventory')">
           <el-icon><Goods /></el-icon>
           <template #title>Inventory</template>

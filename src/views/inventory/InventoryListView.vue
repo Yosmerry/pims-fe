@@ -187,12 +187,7 @@ onMounted(() => {
     </el-breadcrumb>
 
     <header class="page-heading">
-      <div>
-        <p class="eyebrow">Personal inventory</p>
-        <h1>Your belongings</h1>
-        <p>Track, find, and manage everything you own.</p>
-      </div>
-
+      <p class="eyebrow">Your belongings</p>
       <el-button type="primary" :icon="Plus" size="large" @click="router.push('/inventory/new')">
         Add item
       </el-button>

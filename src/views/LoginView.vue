@@ -82,8 +82,6 @@ const submit = async (): Promise<void> => {
           workspace.
         </p>
       </div>
-
-      <div class="brand-note">Simple · Organized · Personal</div>
     </section>
 
     <section class="auth-content">
