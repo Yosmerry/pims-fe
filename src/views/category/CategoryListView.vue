@@ -183,7 +183,7 @@ onMounted(loadCategories)
 </script>
 
 <template>
-  <section class="inventory-page category-page">
+  <section class="app-page category-page">
     <el-breadcrumb separator="/" class="page-breadcrumb">
       <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
       <el-breadcrumb-item>Categories</el-breadcrumb-item>
@@ -201,7 +201,7 @@ onMounted(loadCategories)
       </el-button>
     </header>
 
-    <el-card class="inventory-table-card category-table-card" shadow="never">
+    <el-card class="app-card data-table-card category-table-card" shadow="never">
       <template #header>
         <div class="table-card-heading">
           <div>
@@ -220,7 +220,7 @@ onMounted(loadCategories)
         </div>
       </template>
 
-      <div class="inventory-table-wrap">
+      <div class="data-table-wrap">
         <el-table v-loading="isLoading" :data="result.content" empty-text="No categories found">
           <el-table-column label="Category" min-width="220">
             <template #default="{ row }: { row: Category }">

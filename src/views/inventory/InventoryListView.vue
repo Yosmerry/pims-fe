@@ -180,7 +180,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="inventory-page">
+  <section class="app-page inventory-list-page">
     <el-breadcrumb separator="/" class="page-breadcrumb">
       <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
       <el-breadcrumb-item>Inventory</el-breadcrumb-item>
@@ -194,7 +194,7 @@ onMounted(() => {
     </header>
 
     <div class="inventory-list-layout">
-      <el-card class="filter-card" shadow="never">
+      <el-card class="app-card filter-card" shadow="never">
         <template #header>
           <div class="card-heading">
             <span
@@ -290,7 +290,7 @@ onMounted(() => {
         </el-form>
       </el-card>
 
-      <el-card class="inventory-table-card" shadow="never">
+      <el-card class="app-card data-table-card inventory-table-card" shadow="never">
         <template #header>
           <div class="table-card-heading">
             <div>
@@ -301,7 +301,7 @@ onMounted(() => {
           </div>
         </template>
 
-        <div class="inventory-table-wrap">
+        <div class="data-table-wrap">
           <el-table
             v-loading="isLoading"
             :data="result.content"

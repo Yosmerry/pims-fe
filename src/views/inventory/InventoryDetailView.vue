@@ -87,7 +87,7 @@ onMounted(loadDetail)
 </script>
 
 <template>
-  <section v-loading="isLoading" class="inventory-page detail-page">
+  <section v-loading="isLoading" class="app-page detail-page">
     <el-breadcrumb separator="/" class="page-breadcrumb">
       <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '/inventory' }">Inventory</el-breadcrumb-item>
@@ -95,7 +95,7 @@ onMounted(loadDetail)
     </el-breadcrumb>
 
     <template v-if="item">
-      <el-card class="detail-hero" shadow="never">
+      <el-card class="app-card detail-hero" shadow="never">
         <div class="detail-hero__content">
           <div>
             <el-button :icon="ArrowLeft" text @click="router.push('/inventory')"
@@ -120,7 +120,7 @@ onMounted(loadDetail)
       </el-card>
 
       <div class="detail-layout">
-        <el-card class="detail-card" shadow="never">
+        <el-card class="app-card detail-card" shadow="never">
           <template #header>
             <div class="card-heading"><span>General information</span></div>
           </template>
@@ -184,7 +184,7 @@ onMounted(loadDetail)
         </el-card>
 
         <aside class="detail-summary">
-          <el-card shadow="never">
+          <el-card class="app-card" shadow="never">
             <template #header>
               <div class="card-heading"><span>Summary</span></div>
             </template>
@@ -216,7 +216,7 @@ onMounted(loadDetail)
       </div>
     </template>
 
-    <el-card v-else-if="!isLoading" class="not-found-card" shadow="never">
+    <el-card v-else-if="!isLoading" class="app-card not-found-card" shadow="never">
       <el-empty description="Inventory item could not be loaded">
         <el-button type="primary" @click="router.push('/inventory')">Back to inventory</el-button>
       </el-empty>

@@ -228,7 +228,7 @@ onMounted(loadPage)
 </script>
 
 <template>
-  <section v-loading="isLoading" class="inventory-page form-page">
+  <section v-loading="isLoading" class="app-page form-page">
     <el-breadcrumb separator="/" class="page-breadcrumb">
       <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '/inventory' }">Inventory</el-breadcrumb-item>
@@ -239,7 +239,7 @@ onMounted(loadPage)
       <el-button :icon="ArrowLeft" text @click="router.push(cancelPath)">Back</el-button>
     </div>
 
-    <el-card class="inventory-form-card" shadow="never">
+    <el-card class="app-card inventory-form-card" shadow="never">
       <el-form
         ref="formRef"
         :model="form"
