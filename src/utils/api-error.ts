@@ -27,6 +27,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   FutureDate: 'The date cannot be in the future.',
   NotFound: 'The requested record was not found.',
   FileTooLarge: 'The image must be 5 MB or smaller.',
+  Maximum5: 'Maximum of 5 images per inventory item.',
   UnsupportedFileType: 'Only JPEG and PNG images are supported.',
   StorageFailed: 'The image could not be stored. Please try again.',
 }
