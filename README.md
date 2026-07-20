@@ -21,7 +21,7 @@ categories, locations, and inventory images through the PIMS REST API.
 
 - [Backend repository](https://github.com/Yosmerry/pims-be)
 - [API contracts](https://github.com/Yosmerry/pims-be/tree/release/1.0.0-RELEASE/docs/api)
-- [Backend application flow](https://github.com/Yosmerry/pims-be/blob/release/1.0.0-RELEASE/docs/foundation/summary.md)
+- [Backend application flow](https://github.com/Yosmerry/pims-be/blob/acb56e94a55adac3970e799a2b6225172c87fd21/docs/foundation/summary.md)
 - [Entity relationship diagram](https://github.com/Yosmerry/pims-be/blob/release/1.0.0-RELEASE/docs/foundation/pims-erd.jpg)
 
 ## Implemented Scope
