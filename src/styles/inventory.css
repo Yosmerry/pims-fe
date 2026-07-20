@@ -429,6 +429,21 @@
   color: var(--pims-gray);
 }
 
+.image-upload-item .el-upload__text small {
+  display: block;
+  margin-top: 6px;
+  color: var(--pims-gray);
+  font-size: 12px;
+}
+
+.image-upload-item .image-upload--full .el-upload {
+  display: none;
+}
+
+.image-upload-item .el-upload-list {
+  width: 100%;
+}
+
 .inventory-form-actions {
   margin-top: 30px;
   padding-top: 24px;
