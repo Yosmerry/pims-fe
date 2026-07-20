@@ -39,6 +39,11 @@ const router = createRouter({
           name: 'category-list',
           component: () => import('@/views/category/CategoryListView.vue'),
         },
+        {
+          path: 'locations',
+          name: 'location-list',
+          component: () => import('@/views/location/LocationListView.vue'),
+        },
       ],
     },
     {
