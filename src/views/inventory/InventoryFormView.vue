@@ -11,6 +11,7 @@ import {
 } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
 
+import { imageApi } from '@/api/image.api'
 import { inventoryApi } from '@/api/inventory.api'
 import { referenceApi } from '@/api/reference.api'
 import {
@@ -206,7 +207,7 @@ const submit = async (): Promise<void> => {
 
     if (selectedImage.value) {
       try {
-        await inventoryApi.uploadImage(savedItem.code, selectedImage.value)
+        await imageApi.upload(savedItem.code, selectedImage.value)
       } catch (imageError) {
         ElMessage.warning(`Item saved, but ${getApiErrorMessage(imageError).toLowerCase()}`)
         await router.replace(`/inventory/${savedItem.code}`)

@@ -2,7 +2,6 @@ import { apiClient } from '@/api/client'
 import type { ApiResponse } from '@/types/api'
 import type {
   CreateInventoryItemRequest,
-  InventoryImage,
   InventoryItem,
   InventoryItemFilter,
   UpdateInventoryItemRequest,
@@ -39,16 +38,5 @@ export const inventoryApi = {
 
   async delete(code: string): Promise<void> {
     await apiClient.delete(`${INVENTORY_PATH}/${code}`)
-  },
-
-  async uploadImage(inventoryItemCode: string, file: File): Promise<InventoryImage> {
-    const formData = new FormData()
-    formData.append('file', file)
-
-    const response = await apiClient.post<ApiResponse<InventoryImage>>(
-      `${INVENTORY_PATH}/${inventoryItemCode}/images`,
-      formData,
-    )
-    return response.data.data
   },
 }
